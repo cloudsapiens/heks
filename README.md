@@ -89,7 +89,12 @@ Secondly, change the access permissions of saphana-k8s-deployment-script.sh:
 chmod +x saphana-k8s-deployment-script.sh
 ```
 
-Afterwards in the terminal, you will be asked for some parameters in an interactive shell.
+Afterwards in the terminal, execut it
+```sh
+./saphana-k8s-deployment-script.sh
+```
+
+you will be asked for some parameters in an interactive shell.
 
 The deployment takes about 10 minutes
 
