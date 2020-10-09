@@ -102,7 +102,7 @@ The deployment takes about 10 minutes
 
 The following command deletes all EKS related resources in your AWS account
 ```sh
-eksctl delete cluster -f saphana-k8s-deployment-script.sh
+eksctl delete cluster -f create-k8s-cluster-spot-nodes.yaml
 ```
 
 Afterwards delete the following in the AWS management console:
