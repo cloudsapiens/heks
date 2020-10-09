@@ -4,7 +4,24 @@
 SAP HANA, express edition on Amazon Elastic Kubernetes Service
 ```
 
-This project is about to provide an automated way to deploy SAP HANA, express edition to Amazon Elastic Kubernetes Service (EKS). 
+This project is about to provide an automated way to deploy SAP HANA, express edition to Amazon Elastic Kubernetes Service (EKS) on a EC2 Spot instance. 
+In addition a component will be deployed to handle how the cluster responds to the interruption of a Spot Instance. 
+
+The workflow can be summarized as:
+
+ - Identify that a Spot Instance is being reclaimed.
+ - Use the 2-minute notification window to gracefully prepare the node for termination.
+ - Taint the node and cordon it off to prevent new pods from being placed.
+ - Drain connections on the running pods.
+ - To maintain desired capacity, replace the pods on remaining nodes.
+
+Spot interruptions are reported in the following ways:
+
+ - In the EC2 instance, using the EC2 metadata service
+ - In the AWS account, using CloudWatch Events
+
+For heks, a K8s DaemonSet will be used, which means running one pod per node. The pod periodically polls the EC2 metadata service for a Spot termination notice. If a termination notice is received (HTTP status 200), then it tries to gracefully stop and restart on other nodes before the 2-minute grace period expires. This approach is based on an existing project at the [kube-spot-termination-notice-handler](https://github.com/kube-aws/kube-spot-termination-notice-handler) GitHub repository.
+
 AWS services used for this solution:
   - Amazon Elastic Kubernetes Service (```EKS```)
   - Amazon Elastic File System (```EFS```)
