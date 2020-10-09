@@ -66,7 +66,7 @@ aws ec2 create-security-group --description efs-security-group --group-name efs-
 groupId=$(aws ec2 describe-security-groups --filters Name=group-name,Values=efs-sg --query "SecurityGroups[*].{ID:GroupId}" --output text)
 
 # Get public IP of EKS worker node
-getPublicIp=$(aws ec2 describe-instances --filter "Name=key-name,Values=sap" --query "Reservations[*].Instances[*].[PublicIpAddress]" --output text | tr -dc '0-9.') 
+getPublicIp=$(aws ec2 describe-instances --filter "Name=key-name,Values=$eksKeyPairName" --query "Reservations[*].Instances[*].[PublicIpAddress]" --output text | tr -dc '0-9.') 
 publicIP=$getPublicIp"/32"
 
 # Adds an NFS inbound rule to enable resources in your VPC to communicate with your EFS
