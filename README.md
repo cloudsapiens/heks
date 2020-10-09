@@ -4,7 +4,7 @@
 SAP HANA, express edition on Amazon Elastic Kubernetes Service
 ```
 
-This project is about to provide an automated way to deploy SAP HANA, express edition to Amazon Elastic Kubernetes Service (EKS) on a EC2 Spot instance. 
+This project is about to provide an automated way to deploy SAP HANA, express edition to Amazon Elastic Kubernetes Service (EKS) on an EC2 Spot instance. 
 In addition a component will be deployed to handle how the cluster responds to the interruption of a Spot Instance. 
 
 The workflow can be summarized as:
