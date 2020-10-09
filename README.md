@@ -73,7 +73,7 @@ The script is divided into following sections:
   - Creating EFS Storage with a dedicated security group and inbound rule 
   - Creating Kubernetes Secret for Docker Registry to store user, password, and Docker Hub e-mail address to pull the necessary images
   - Gathering master password for SAP HANA database
-  - Generating YAML file for ```ClusterRole```, ```ServiceAccount```, ```ClusterRoleBinding```, ```DaemonSet```, ```StorageClass```, ```PersistentVolume```, ```PersistentVolumeClaim```, ```Deployment```, and ```Service``` for SAP HANA, Express Edition
+  - Generating YAML file for ```ClusterRole```, ```ServiceAccount```, ```ClusterRoleBinding```, ```DaemonSet```, ```StorageClass```, ```PersistentVolume```, ```Deployment```, and ```Service``` for SAP HANA, Express Edition
 
 ### Installation
 
