@@ -68,12 +68,12 @@ Saphana-k8s-deployment-script.sh is an ultimate tool to deploy SAP HANA, express
 The script is divided into following sections:
 
   - Gathering information about name of cluster, AWS region to deploy to, and name of EC2 key pair
-  - Generating YAML definition for kubectl to create Kubernetes cluster
+  - Generating YAML definition for kubectl to create Kubernetes cluster (```create-k8s-cluster-spot-nodes.yaml```)
   - Installing ```aws-efs-csi-driver```
   - Creating EFS Storage with a dedicated security group and inbound rule 
   - Creating Kubernetes Secret for Docker Registry to store user, password, and Docker Hub e-mail address to pull the necessary images
   - Gathering master password for SAP HANA database
-  - Generating YAML file for ```ClusterRole```, ```ServiceAccount```, ```ClusterRoleBinding```, ```DaemonSet```, ```StorageClass```, ```PersistentVolume```, ```Deployment```, and ```Service``` for SAP HANA, Express Edition
+  - Generating YAML file for ```ClusterRole```, ```ServiceAccount```, ```ClusterRoleBinding```, ```DaemonSet```, ```StorageClass```, ```PersistentVolume```, ```Deployment```, and ```Service``` for SAP HANA, Express Edition (```saphana-k8s-deployment.yaml```)
 
 ### Installation
 
