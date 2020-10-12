@@ -42,6 +42,16 @@ Please make sure that you setup the following before starting the shell script.
 1) Ensure that you have an AWS Account
 2) Ensure that you have created a [new user in IAM](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
 3) Ensure that you have generated Access Key and Secret Access Key to your user and stored in a secure place
+4) Ensure that your IAM User has permission to the following policies:
+ - ```AmazonEC2FullAccess```
+ - ```AmazonEKS_CNI_Policy```
+ - ```AmazonEKSClusterPolicy```
+ - ```AmazonEKSServicePolicy```
+ - ```AmazonEKSServiceRolePolicy```
+ - ```AmazonEKSVPCResourceController```
+ - ```AmazonEKSWorkerNodePolicy```
+ - ```AWSServiceRoleForAmazonEKSNodegroup```
+ - ```AmazonElasticFileSystemFullAccess```
 4) Ensure that you have installed AWS CLI v2.0 (see Step 0)
 5) Ensure that you have configured AWS CLI with your Access Key and Secret Access Key in the desired AWS region (see Step 0)
 6) Ensure that you have [installed eksctl](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html) 
