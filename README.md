@@ -52,6 +52,10 @@ Please make sure that you setup the following before starting the shell script.
  - ```AmazonEKSWorkerNodePolicy```
  - ```AWSServiceRoleForAmazonEKSNodegroup```
  - ```AmazonElasticFileSystemFullAccess```
+ 
+ ```sh
+ Note: in worst case scenario, you can use ```AdministratorAccess``` to grant your user admin access.
+ ```
 4) Ensure that you have installed AWS CLI v2.0 (see Step 0)
 5) Ensure that you have configured AWS CLI with your Access Key and Secret Access Key in the desired AWS region (see Step 0)
 6) Ensure that you have [installed eksctl](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html) 
