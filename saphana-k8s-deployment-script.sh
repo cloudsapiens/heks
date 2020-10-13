@@ -1,4 +1,7 @@
 #!/bin/sh
+
+# This script creates all resources used to deploy your SAP HANA, express edition on Amazon EKS
+
 clear
 echo "Welcome to heks, the ultimate SAP HANA, express edition installer powered by Amazon Elastic Kubernetes Service (EKS)!"
 echo 
@@ -49,46 +52,6 @@ nodeGroups:
 
 # Creates a Kubernetes cluster with an unmanaged NodeGroup of one R4.XLARGE spot instance
 eksctl create cluster -f create-k8s-cluster-spot-nodes.yaml
-
-# Deploys the Amazon EFS CSI driver
-kubectl apply -k "github.com/kubernetes-sigs/aws-efs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
-
-# Gets VPC ID to set-up EFS storage
-vpc=$(aws eks describe-cluster --name $eksClusterName --query "cluster.resourcesVpcConfig.vpcId" --output text)
-
-# Gets the CIDR range for your VPC cluster
-vpcCidr=$(aws ec2 describe-vpcs --vpc-ids $vpc --query "Vpcs[].CidrBlock" --output text)
-
-# Creates a security group that allows inbound network file system (NFS) traffic for your Amazon EFS mount points
-aws ec2 create-security-group --description efs-security-group --group-name efs-sg --vpc-id $vpc
-
-# Sets groupId variable with value of the newly created security group
-groupId=$(aws ec2 describe-security-groups --filters Name=group-name,Values=efs-sg --query "SecurityGroups[*].{ID:GroupId}" --output text)
-
-# Get public IP of EKS worker node
-getPublicIp=$(aws ec2 describe-instances --filter "Name=key-name,Values=$eksKeyPairName" --query "Reservations[*].Instances[*].[PublicIpAddress]" --output text | tr -dc '0-9.') 
-publicIP=$getPublicIp"/32"
-
-# Adds an NFS inbound rule to enable resources in your VPC to communicate with your EFS
-aws ec2 authorize-security-group-ingress --group-id $groupId  --protocol tcp --port 2049 --cidr $publicIP
-
-# Creates an Amazon EFS file system for your Amazon EKS cluster
-aws efs create-file-system --creation-token eks-efs 
-
-# Gets the File System ID for your EFS storage
-fileSystemId=$(aws efs describe-file-systems --creation-token eks-efs --query "FileSystems[*].{ID:FileSystemId}" --output text)
-
-# Creates a mount target for the EFS, run the following command in all the Availability Zones where your worker nodes are running:
-eksSubnets=$(aws eks describe-cluster --name $eksClusterName --query "cluster.resourcesVpcConfig.subnetIds" --output text) 
-read -a subnetsArray <<< $eksSubnets
-
-for subnets in "${subnetsArray[@]}"
-do
-    aws efs create-mount-target --file-system-id $fileSystemId --subnet-id $subnets --security-group $groupId 
-done
-
-sleep 30
-
 
 # Creates a secret based on entered username and password to fetch the private SAP HANA, Express Edition Docker image from DockerHub repository
 echo 
@@ -211,28 +174,6 @@ echo "
         nodeSelector:
           lifecycle: Ec2Spot
 ---
-  kind: StorageClass
-  apiVersion: storage.k8s.io/v1
-  metadata:
-    name: efs-sc
-  provisioner: efs.csi.aws.com
----
-  kind: PersistentVolume
-  apiVersion: v1
-  metadata:
-    name: efs-pv
-  spec:
-    capacity:
-      storage: 150Gi
-    volumeMode: Filesystem
-    accessModes:
-      - ReadWriteMany
-    persistentVolumeReclaimPolicy: Retain
-    storageClassName: efs-sc
-    csi:
-      driver: efs.csi.aws.com
-      volumeHandle: $fileSystemId
----
   apiVersion: apps/v1
   kind: Deployment
   metadata:
@@ -267,16 +208,26 @@ echo "
           ports:
             - containerPort: 39013
               name: port1
-            - containerPort: 39015
-              name: port2
             - containerPort: 39017
-              name: port3
-            - containerPort: 8090
-              name: port4
+              name: port2
             - containerPort: 39041
+              name: port3
+            - containerPort: 39042
+              name: port4
+            - containerPort: 39043
               name: port5
-            - containerPort: 59013
+            - containerPort: 39044
               name: port6
+            - containerPort: 39045
+              name: port7
+            - containerPort: 1128
+              name: port8
+            - containerPort: 1129
+              name: port9
+            - containerPort: 59013
+              name: port10
+            - containerPort: 59014
+              name: port11                                       
           args: [ --agree-to-sap-license, --dont-check-system, --master-password, $sapHanaMasterPassword ]
           volumeMounts:
             - name: hxe-data
@@ -294,15 +245,36 @@ echo "
     - port: 39013
       targetPort: 39013
       name: port1
-    - port: 39015
-      targetPort: 39015
-      name: port2
     - port: 39017
       targetPort: 39017
-      name: port3
+      name: port2
     - port: 39041
       targetPort: 39041
-      name: port5
+      name: port3
+    - port: 39042
+      targetPort: 39042
+      name: port4
+     - port: 39043
+      targetPort: 39043
+      name: port5     
+    - port: 39044
+      targetPort: 39044
+      name: port6
+    - port: 39045
+      targetPort: 39045
+      name: port7
+    - port: 1128
+      targetPort: 1128
+      name: port8
+    - port: 1129
+      targetPort: 1129
+      name: port9
+    - port: 59013
+      targetPort: 59013
+      name: port10
+    - port: 59014
+      targetPort: 59014
+      name: port11
     selector:
       app: hxe" > saphana-k8s-deployment.yaml
 
@@ -312,4 +284,5 @@ kubectl create -f saphana-k8s-deployment.yaml
 # Provides information about pods
 kubectl get pods
 
+echo
 echo "Setup completed. Your SAP HANA, express edition will be up and running in a few minutes."

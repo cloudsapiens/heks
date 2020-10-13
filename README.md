@@ -23,7 +23,6 @@ For heks, a K8s DaemonSet will be used, which means running one pod per node. Th
 
 AWS services used for this solution:
   - Amazon Elastic Kubernetes Service (```EKS```)
-  - Amazon Elastic File System (```EFS```)
   - Amazon Elastic Cloud Compute (```EC2```)
 
 Source of the SAP HANA, Express Edition (private repository):  [Docker Hub](https://hub.docker.com/_/sap-hana-express-edition)
@@ -51,7 +50,6 @@ Please make sure that you setup the following before starting the shell script.
  - ```AmazonEKSVPCResourceController```
  - ```AmazonEKSWorkerNodePolicy```
  - ```AWSServiceRoleForAmazonEKSNodegroup```
- - ```AmazonElasticFileSystemFullAccess```
  
  ```sh
  Note: in worst case scenario, you can use AdministratorAccess to grant your user admin access.
@@ -99,11 +97,9 @@ The script is divided into following sections:
 
   - Gathering information about name of cluster, AWS region to deploy to, and name of EC2 key pair
   - Generating YAML definition for kubectl to create Kubernetes cluster (```create-k8s-cluster-spot-nodes.yaml```)
-  - Installing ```aws-efs-csi-driver```
-  - Creating EFS Storage with a dedicated security group and inbound rule 
   - Creating Kubernetes Secret for Docker Registry to store user, password, and Docker Hub e-mail address to pull the necessary images
   - Gathering master password for SAP HANA database
-  - Generating YAML file for ```ClusterRole```, ```ServiceAccount```, ```ClusterRoleBinding```, ```DaemonSet```, ```StorageClass```, ```PersistentVolume```, ```Deployment```, and ```Service``` for SAP HANA, Express Edition (```saphana-k8s-deployment.yaml```)
+  - Generating YAML file for ```ClusterRole```, ```ServiceAccount```, ```ClusterRoleBinding```, ```DaemonSet```, ```Deployment```, and ```Service``` for SAP HANA, Express Edition (```saphana-k8s-deployment.yaml```)
 
 ### Installation
 
@@ -119,7 +115,7 @@ Secondly, change the access permissions of saphana-k8s-deployment-script.sh:
 chmod +x saphana-k8s-deployment-script.sh
 ```
 
-Afterwards in the terminal, execut it
+Afterwards in the terminal, execute it
 ```sh
 ./saphana-k8s-deployment-script.sh
 ```
@@ -128,17 +124,27 @@ you will be asked for some parameters in an interactive shell.
 
 The deployment takes about 10 minutes
 
+After the installation, please make sure to open only the necessary TCP ports in the security group.
+
+The following are default ports for this deployment (SID: 90):
+ - ```39013``` (SAP HANA indexserver)
+ - ```39017``` (SAP HANA statisticsserver)
+ - ```39041``` (SQL/MDX access port for standard access to the tenant databases of a multitenant system)
+ - ```39042``` (Internal port of the XS classic server in the initial tenant database of a new multitenant system or an upgraded single-container system)
+ - ```39043``` (Port used by streaming clients running outside the SAP HANA system to connect to streaming web services such as Streaming Web Service (SWS) and Web Services Provider (WSP) using various web protocols)
+ - ```39044``` (Port used by streaming clients running outside the SAP HANA system to connect to streaming web services such as Streaming Web Service (SWS) and Web Services Provider (WSP) using various web protocols)
+ - ```39045``` (Port used by streaming clients running outside the SAP HANA system to connect to streaming web services such as Streaming Web Service (SWS) and Web Services Provider (WSP) using various web protocols)
+ - ```1128``` (SAP Host Agent with SOAP/HTTP - saphostctrl)
+ - ```1129``` (SAP Host Agent with SOAP/HTTP - saphostctrls)
+ - ```59013``` (Instance Agent)
+ - ```59014``` (Instance Agent)
+
 ### Uninstallation
 
 The following command deletes all EKS related resources in your AWS account
 ```sh
-eksctl delete cluster -f create-k8s-cluster-spot-nodes.yaml
+chmod +x uninstall-saphana-k8s.sh && ./uninstall-saphana-k8s.sh
 ```
-
-Afterwards delete the following in the AWS management console:
- - Security Group with the name efs-sd 
- - Key pair in EC2 console
- - EFS storage 
 
 
 ### (Optional) Create table with HdbSQL command inside the container
