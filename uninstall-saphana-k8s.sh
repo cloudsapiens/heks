@@ -9,3 +9,4 @@ eksctl delete cluster -f create-k8s-cluster-spot-nodes.yaml
 echo 
 read -p "Please enter the name of the EC2 keypair (hint: filename without .pem extension): "  ec2KeyPair
 aws ec2 delete-key-pair --key-name $ec2KeyPair
+rm $ec2KeyPair.pem
