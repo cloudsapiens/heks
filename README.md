@@ -167,3 +167,6 @@ hdbsql -i 90 -d SYSTEMDB -u SYSTEM -p <YOURVERYSECUREPASSWORD>
 CREATE COLUMN TABLE company_leaders (name NVARCHAR(30), position VARCHAR(30));
 INSERT INTO company_leaders VALUES ('Test1', 'Lead Architect');
 ```
+### ToDo
+ - SAP HANA Backup with AWS Backint Agent (seperate project planned for setup)
+ - Create backup in 2-minute notification window and auto-restore of data from S3 in the new Pod
